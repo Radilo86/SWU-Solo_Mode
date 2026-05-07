@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Wars: Unlimited — Modo en Solitario (Definitivo v2.2)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+  :root {
+    --red: #c1272d;
+    --red-dark: #8a0000;
+    --red-glow: #ff3a3a;
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --bg-void: #050508;
+    --bg-deep: #0a0a0f;
+    --bg-panel: #0f0f1a;
+    --bg-card: #13131f;
+    --bg-card-hover: #1a1a2e;
+    --border-subtle: rgba(193,39,45,0.25);
+    --border-mid: rgba(193,39,45,0.5);
+    --border-strong: rgba(193,39,45,0.85);
+    --text-primary: #e8e4d8;
+    --text-secondary: #a09888;
+    --text-muted: #5a5248;
+    --text-gold: #c9a84c;
+    --accent-blue: #4a9eca;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* STARFIELD */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 25%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 80%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 5% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 55% 45%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 5%, rgba(255,255,255,0.5) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 3rem;
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 1px;
+    background: var(--red);
+    box-shadow: 0 0 12px var(--red);
+  }
+
+  .logo-sub {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    font-weight: 900;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 span {
+    color: var(--red);
+  }
+
+  .header-tag {
+    display: inline-block;
+    border: 1px solid var(--border-mid);
+    color: var(--text-gold);
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    padding: 4px 16px;
+    margin-top: 1rem;
+    text-transform: uppercase;
+  }
+
+  .version-note {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 0.75rem;
+    font-style: italic;
+  }
+
+  /* TABLE OF CONTENTS */
+  .toc {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--red);
+    padding: 1.5rem 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .toc-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--text-gold);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .toc ol {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 2rem;
+  }
+
+  .toc ol li {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .toc ol li a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .toc ol li a:hover { color: var(--red); }
+
+  .toc ol li span {
+    color: var(--red);
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    margin-right: 8px;
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 3.5rem;
+    scroll-margin-top: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-subtle);
+    position: relative;
+  }
+
+  .section-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 0.1em;
+    min-width: 32px;
+  }
+
+  h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+    text-transform: uppercase;
+  }
+
+  h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-gold);
+    text-transform: uppercase;
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  p { margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 15px; }
+
+  /* PRIORITY LIST */
+  .priority-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .priority-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    padding: 0.875rem 1rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .priority-list li:hover {
+    border-color: var(--border-mid);
+    background: var(--bg-card-hover);
+  }
+
+  .prio-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--red);
+    min-width: 28px;
+    line-height: 1;
+    padding-top: 2px;
+  }
+  
+  .prio-num.zero {
+    color: #ff0000;
+    text-shadow: 0 0 8px #ff0000;
+  }
+
+  .prio-body { flex: 1; }
+
+  .prio-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .prio-detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .prio-detail em { color: var(--text-gold); font-style: normal; }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+
+  .info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-top: 2px solid var(--red);
+    padding: 1.25rem;
+  }
+
+  .info-card .card-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .info-card .card-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 0.4rem;
+  }
+
+  .info-card p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* DIFFICULTY TABLE */
+  .diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.25rem 0;
+    font-size: 14px;
+  }
+
+  .diff-table thead tr {
+    background: var(--red-dark);
+  }
+
+  .diff-table th {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .diff-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    vertical-align: top;
+  }
+
+  .diff-table tr:nth-child(even) td { background: var(--bg-card); }
+  .diff-table tr:nth-child(odd) td { background: var(--bg-panel); }
+
+  .diff-label {
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .diff-label.padawan { color: #4a9eca; }
+  .diff-label.knight { color: #80c040; }
+  .diff-label.master { color: var(--text-gold); }
+  .diff-label.sith { color: var(--red); }
+
+  /* CALLOUT BOX */
+  .callout {
+    border: 1px solid var(--border-mid);
+    border-left: 4px solid var(--red);
+    background: rgba(193,39,45,0.06);
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+  }
+
+  .callout-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .callout p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* GOLD CALLOUT */
+  .callout.gold {
+    border-left-color: var(--gold);
+    background: rgba(201,168,76,0.05);
+  }
+  .callout.gold .callout-title { color: var(--gold); }
+
+  /* SETUP STEPS */
+  .setup-steps { list-style: none; margin: 1rem 0; }
+
+  .setup-steps li {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    align-items: flex-start;
+  }
+
+  .setup-steps li:last-child { border-bottom: none; }
+
+  .step-bullet {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .setup-steps li p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .setup-steps li p strong { color: var(--text-primary); }
+
+  /* TARGETING TABLE */
+  .target-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 1rem 0;
+  }
+  .target-table th {
+    background: rgba(193,39,45,0.15);
+    color: var(--text-primary);
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border: 1px solid var(--border-subtle);
+    text-align: left;
+  }
+  .target-table td {
+    padding: 9px 12px;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+  }
+  .target-table tr:nth-child(odd) td { background: var(--bg-panel); }
+  .target-table tr:nth-child(even) td { background: var(--bg-card); }
+
+  /* KEYWORD TAG */
+  .kw {
+    display: inline-block;
+    background: rgba(193,39,45,0.12);
+    border: 1px solid var(--border-mid);
+    color: var(--red-glow);
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    padding: 1px 8px;
+    vertical-align: middle;
+    margin: 0 2px;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 3rem 0 2rem;
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 2rem;
+  }
+
+  footer p {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  footer .footer-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .toc ol { grid-template-columns: 1fr; }
+    .cards-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 1.3rem; }
+    .container { padding: 0 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <p class="logo-sub">Star Wars™: Unlimited</p>
+    <h1>MODO EN <span>SOLITARIO</span></h1>
+    <p class="logo-sub" style="margin-top:0.25rem">Sistema Automa — El Oráculo Oscuro</p>
+    <div class="header-tag">Reglamento no oficial · Compatible con Set 1, 2 y 3</div>
+    <p class="version-note">VERSIÓN DEFINITIVA 2.2 · Ajustado para Alta Competitividad</p>
+  </header>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <p class="toc-title">// Índice de contenidos</p>
+    <ol>
+      <li><a href="#intro"><span>00</span>Introducción y Filosofía</a></li>
+      <li><a href="#prep"><span>01</span>Preparación</a></li>
+      <li><a href="#economia"><span>02</span>Economía del Automa</a></li>
+      <li><a href="#accion"><span>03</span>Fase de Acción (Prioridades)</a></li>
+      <li><a href="#combate"><span>04</span>Lógica de Combate y Objetivos</a></li>
+      <li><a href="#liderbase"><span>05</span>Líder y Base (Despliegue)</a></li>
+      <li><a href="#especiales"><span>06</span>Habilidades Especiales y Casos</a></li>
+      <li><a href="#dificultad"><span>07</span>Niveles de Dificultad</a></li>
+      <li><a href="#referencia"><span>08</span>Hoja de Referencia Rápida</a></li>
+    </ol>
+  </div>
+
+  <!-- 00 INTRO -->
+  <div class="section" id="intro">
+    <div class="section-header">
+      <span class="section-num">00</span>
+      <h2>Introducción y Filosofía</h2>
+    </div>
+    <p>El <strong>Oráculo Oscuro</strong> es un sistema de inteligencia artificial heurística para jugar <em>Star Wars: Unlimited</em> en solitario. No simula un jugador "perfecto"; simula un oponente <strong>coherente y amenazante</strong> que toma decisiones tácticas creíbles sin requerir que tú leas una mente en su nombre.</p>
+
+    <div class="callout gold">
+      <p class="callout-title">// Principio de Baja Carga</p>
+      <p>El turno del Automa debe resolverse en <strong>15 segundos o menos</strong>. El sistema prioriza la velocidad y la predictibilidad. Nunca debes tomar decisiones tácticas subjetivas por él.</p>
+    </div>
+  </div>
+
+  <!-- 01 PREPARACIÓN -->
+  <div class="section" id="prep">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>Preparación</h2>
+    </div>
+    <ul class="setup-steps">
+      <li>
+        <div class="step-bullet">A</div>
+        <p><strong>Mazo del Automa:</strong> Usa cualquier mazo de al menos 50 cartas + Líder + Base. El Automa no necesita adaptaciones.</p>
+      </li>
+      <li>
+        <div class="step-bullet">B</div>
+        <p><strong>Iniciativa:</strong> Tú siempre tienes la iniciativa al inicio de la partida.</p>
+      </li>
+      <li>
+        <div class="step-bullet">C</div>
+        <p><strong>Mano Inicial:</strong> Baraja el mazo del Automa. No hay mulligan. Saca 2 cartas boca abajo para sus recursos iniciales (no las mires).</p>
+      </li>
+      <li>
+        <div class="step-bullet">D</div>
+        <p><strong>Pila de Mano:</strong> Saca 4 cartas más boca abajo al lado del mazo. Esta es la <strong>Pila de Mano</strong> del Automa.</p>
+      </li>
+      <li>
+        <div class="step-bullet">E</div>
+        <p><strong>Contador de Coste Disponible (CCA):</strong> Prepara un dado. Empieza en <strong>2</strong> (representando sus recursos).</p>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 02 ECONOMÍA -->
+  <div class="section" id="economia">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>Economía del Automa</h2>
+    </div>
+    <p>El Automa gestiona sus recursos con el <strong>Contador de Coste Disponible (CCA)</strong>. Sus recursos crecen independientemente de su mano para garantizar una presión constante.</p>
+
+    <h3>Fase de Reagrupamiento del Automa</h3>
+    <ul class="setup-steps">
+      <li>
+        <div class="step-bullet">1</div>
+        <p><strong>Robar cartas:</strong> Roba 2 cartas del <em>Mazo Principal</em> y añádelas boca abajo a su Pila de Mano. (Límite de mano ignorado).</p>
+      </li>
+      <li>
+        <div class="step-bullet">2</div>
+        <p><strong>Recursar:</strong> Toma la carta superior del <em>Mazo Principal</em> y colócala boca abajo como recurso. Aumenta su CCA en +1 (hasta un máximo de 10).</p>
+      </li>
+      <li>
+        <div class="step-bullet">3</div>
+        <p><strong>Preparar:</strong> Todos sus recursos y unidades se preparan. El CCA representa ahora todos sus recursos listos.</p>
+      </li>
+    </ul>
+
+    <div class="callout">
+      <p class="callout-title">// Inmunidad a la Fatiga (Decking Out)</p>
+      <p>Si el Mazo Principal del Automa se vacía, <strong>no recibe daño</strong>. Simplemente baraja su pila de descartes para formar un nuevo mazo principal y continúa jugando de manera normal.</p>
+    </div>
+  </div>
+
+  <!-- 03 FASE DE ACCIÓN -->
+  <div class="section" id="accion">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>Fase de Acción — Prioridades</h2>
+    </div>
+    <p>Al inicio de su turno, si el Automa no tiene ninguna carta revelada en su pila, voltea boca arriba la carta superior de la Pila de Mano. Esta es su <strong>"Carta Activa"</strong>.</p>
+    <p>Luego, recorre esta lista de arriba a abajo. Ejecuta la <strong>primera acción</strong> posible y te devuelve el turno (1 acción por turno).</p>
+
+    <ul class="priority-list">
+      <li>
+        <div class="prio-num zero">0</div>
+        <div class="prio-body">
+          <span class="prio-title">Instinto Asesino (Letalidad)</span>
+          <span class="prio-detail">Si el Automa puede destruir tu Base este mismo turno (sumando el daño de sus unidades listas o con un evento en su Carta Activa), ignorará todas las prioridades y usará todas sus acciones exclusivamente para atacar la base hasta ganar.</span>
+        </div>
+      </li>
+      <li>
+        <div class="prio-num">1</div>
+        <div class="prio-body">
+          <span class="prio-title">Desplegar al Líder / Usar Acción Épica de Base</span>
+          <span class="prio-detail">El Automa despliega su Líder inmediatamente si su CCA es ≥ al coste impreso del líder. Si su Base hace daño o da escudos, la usa bajo condiciones precisas. Ver Sección 05.</span>
+        </div>
+      </li>
+      <li>
+        <div class="prio-num">2</div>
+        <div class="prio-body">
+          <span class="prio-title">Activar Habilidad del Líder (No Desplegado)</span>
+          <span class="prio-detail">Usa la acción del Líder si es gratuita (coste 0), o si cuesta recursos PERO la Carta Activa cuesta más que el CCA (le sobran recursos este turno).</span>
+        </div>
+      </li>
+      <li>
+        <div class="prio-num">3</div>
+        <div class="prio-body">
+          <span class="prio-title">Atacar para Eliminar (Trade Favorable) o Romper Escudos</span>
+          <span class="prio-detail">Ataca si puede derrotar a tu unidad de mayor Poder sin perder la suya, o ataca con su unidad más débil a una unidad tuya que tenga un token de <span class="kw">SHIELDED</span> para rompérselo.</span>
+        </div>
+      </li>
+      <li>
+        <div class="prio-num">4</div>
+        <div class="prio-body">
+          <span class="prio-title">Jugar la Carta Activa (Unidad o Mejora)</span>
+          <span class="prio-detail">Si la Carta Activa es Unidad/Mejora y tiene CCA suficiente, la juega. (Si su Base tiene <em>Ambush</em>, la activa si logra un Trade Favorable).</span>
+        </div>
+      </li>
+      <li>
+        <div class="prio-num">5</div>
+        <div class="prio-body">
+          <span class="prio-title">Atacar a la Base (Seguro o con Overwhelm)</span>
+          <span class="prio-detail">Ataca a tu base si no arriesga perder a su atacante por un trade enemigo inmediato, o si su unidad tiene <span class="kw">OVERWHELM</span>.</span>
+        </div>
+      </li>
+      <li>
+        <div class="prio-num">6</div>
+        <div class="prio-body">
+          <span class="prio-title">Jugar la Carta Activa (Evento)</span>
+          <span class="prio-detail">Si tiene CCA, lo juega. Daño → tu unidad de mayor Poder que pueda matar. Control (Agotar/Debuff) → tu unidad lista de mayor Poder. Buff → su unidad de mayor HP. <em>(Ver Filtro de Sentido Común abajo)</em>.</span>
+        </div>
+      </li>
+      <li>
+        <div class="prio-num">7</div>
+        <div class="prio-body">
+          <span class="prio-title">Atacar a Unidad Enemiga (Trade Agresivo)</span>
+          <span class="prio-detail">Ataca a tu unidad de mayor poder para dañarla, aunque el Automa pierda su propia unidad en el proceso.</span>
+        </div>
+      </li>
+      <li>
+        <div class="prio-num">8</div>
+        <div class="prio-body">
+          <span class="prio-title">Descartar Carta Activa y Pasar / Iniciativa</span>
+          <span class="prio-detail">Si no pudo hacer nada (su Carta Activa cuesta más que el CCA y no tiene ataques), <strong>descarta la Carta Activa</strong> y pasa, o toma la iniciativa si está disponible.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout gold">
+      <p class="callout-title">// Filtro de Sentido Común (Eventos)</p>
+      <p><strong>Limpiamesas (Board Wipes):</strong> El Automa solo jugará eventos que destruyan múltiples unidades si tú tienes MÁS unidades en juego que él. Si no, descarta la carta y pasa.<br>
+      <strong>Curaciones inútiles:</strong> Si un evento solo cura la base del Automa y esta ya está al máximo de HP, descarta la carta y pasa.</p>
+    </div>
+  </div>
+
+  <!-- 04 LÓGICA DE COMBATE -->
+  <div class="section" id="combate">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>Lógica de Combate y Objetivos</h2>
+    </div>
+    
+    <h3>Selección del Atacante</h3>
+    <p>Siempre ataca con la unidad que tenga <strong>mayor Poder</strong>. En empate: mayor HP restante → menor coste.</p>
+
+    <h3>Choque de Centinelas</h3>
+    <p>Si ataca a una unidad con <span class="kw">SENTINEL</span>, el Automa priorizará usar a sus propias unidades que NO sean Centinelas, guardando a sus defensores para proteger su base.</p>
+
+    <h3>Uso de Mejoras (Upgrades)</h3>
+    <table class="target-table">
+      <thead>
+        <tr>
+          <th>Tipo de Mejora</th>
+          <th>A quién se la equipa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Positiva</strong> (Stats o habilidades)</td>
+          <td>A la unidad del Automa con <strong>mayor HP</strong> (para que sobreviva).</td>
+        </tr>
+        <tr>
+          <td><strong>Negativa</strong> (Quita stats o Entrenched)</td>
+          <td>A la unidad del jugador humano con <strong>mayor Poder</strong>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 05 LÍDER Y BASE -->
+  <div class="section" id="liderbase">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>Líder y Base</h2>
+    </div>
+
+    <h3>Despliegue del Líder (Incondicional)</h3>
+    <p>El Automa siempre despliega a su líder en el mismo turno en el que su <strong>CCA es igual o mayor al coste impreso</strong>. Actúa como unidad normal.</p>
+
+    <h3>Acciones Épicas de Base</h3>
+    <p>El Automa usa las habilidades épicas de su base automáticamente (sin consumir acción extra) bajo estas condiciones:</p>
+    <ul class="setup-steps">
+      <li>
+        <div class="step-bullet">+</div>
+        <p><strong>Bases de Daño (ej. Tarkintown):</strong> Se activa como Prioridad 0.5 si usarla destruye a la unidad enemiga de mayor poder que ya tenga daño.</p>
+      </li>
+      <li>
+        <div class="step-bullet">+</div>
+        <p><strong>Bases de Ambush (ej. ECL):</strong> Se activa al jugar una unidad (Prioridad 4) <em>solo si</em> logra destruir a una unidad tuya sin morir en el intento.</p>
+      </li>
+      <li>
+        <div class="step-bullet">+</div>
+        <p><strong>Bases de Mejora/Escudos (ej. Security Complex):</strong> Se activan automáticamente (Prioridad 0.5) al inicio de la Fase de Acción sobre la unidad del Automa con mayor HP que NO tenga ya un escudo.</p>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 06 ESPECIALES -->
+  <div class="section" id="especiales">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2>Habilidades Especiales y Casos</h2>
+    </div>
+
+    <table class="target-table">
+      <thead>
+        <tr>
+          <th>Situación / Keyword</th>
+          <th>Resolución del Automa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="kw">BOUNCES</span> (A la mano)</td>
+          <td>Si le devuelves una carta a su "mano", el Automa <strong>la descarta</strong>. Su CCA no se recupera. (Pierde el tempo).</td>
+        </tr>
+        <tr>
+          <td>Efectos de <strong>Descarte</strong></td>
+          <td>Si es obligado a descartar de su mano, descarta la carta superior de su Pila de Mano (sin revelarla). Si es al azar, descarta la del fondo de su Pila.</td>
+        </tr>
+        <tr>
+          <td><span class="kw">SMUGGLE</span> (Contrabando)</td>
+          <td>El Automa ignora esta palabra clave. Sus recursos son estrictamente energía, no revisa cartas jugables boca abajo.</td>
+        </tr>
+        <tr>
+          <td><span class="kw">CAPTURE</span> (Capturar)</td>
+          <td>Si el Automa captura, elige siempre a tu unidad de mayor Poder que sea objetivo legal.</td>
+        </tr>
+        <tr>
+          <td><span class="kw">EXPLOIT X</span></td>
+          <td>Asume el coste reducido. Sacrifica unidades propias de menor Poder (siempre que el poder del sacrificado sea menor a la carta jugada).</td>
+        </tr>
+        <tr>
+          <td><span class="kw">BOUNTY</span> a su favor</td>
+          <td>Si el Automa cobra un Bounty, ignora el texto. En su lugar: <strong>Cura 2 a su base y roba 1 carta a su Pila</strong>.</td>
+        </tr>
+        <tr>
+          <td>Daño en <strong>Área</strong> (AoE)</td>
+          <td>Si elige una arena, elige la que tú tengas más Poder. Si distribuye daño, pone el daño letal exacto a tu unidad de más Poder, luego a la siguiente.</td>
+        </tr>
+        <tr>
+          <td><span class="kw">SABOTEUR</span></td>
+          <td>Ignora escudos y Centinelas. Busca el golpe más fuerte (Base si es letal, o unidad).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 07 DIFICULTAD -->
+  <div class="section" id="dificultad">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2>Niveles de Dificultad</h2>
+    </div>
+    <table class="diff-table">
+      <thead>
+        <tr>
+          <th>Nivel</th>
+          <th>Modificaciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="diff-label padawan">I. Padawan</span></td>
+          <td>El Automa empieza con CCA = 0. No despliega líder hasta el Round 6.</td>
+        </tr>
+        <tr>
+          <td><span class="diff-label knight">II. Caballero</span></td>
+          <td>Reglas estándar. CCA inicial = 2.</td>
+        </tr>
+        <tr>
+          <td><span class="diff-label master">III. Maestro</span></td>
+          <td>El Automa empieza con CCA = 3. Agresividad total a tu base.</td>
+        </tr>
+        <tr>
+          <td><span class="diff-label sith">IV. Sith</span></td>
+          <td>CCA inicial = 4. Tu base sufre 3 daños antes del Round 1.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 08 REFERENCIA RÁPIDA -->
+  <div class="section" id="referencia">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2>Hoja de Referencia Rápida</h2>
+    </div>
+
+    <div style="background: var(--bg-panel); border: 1px solid var(--border-mid); padding: 1.5rem; margin-top: 1rem;">
+      <p style="font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 0.3em; color: var(--red); margin-bottom: 1rem;">// PRIORIDADES DE ACCIÓN (1 por turno)</p>
+
+      <ul class="priority-list" style="gap: 0.35rem;">
+        <li style="padding: 0.6rem 0.875rem;">
+          <div class="prio-num zero" style="font-size:14px; min-width:22px;">0</div>
+          <div class="prio-body"><span class="prio-detail">¿Daño Letal a tu Base? → <em>Ignora todo, Ataca Base</em></span></div>
+        </li>
+        <li style="padding: 0.6rem 0.875rem;">
+          <div class="prio-num" style="font-size:14px; min-width:22px;">1</div>
+          <div class="prio-body"><span class="prio-detail">¿CCA ≥ Coste del Líder? → <em>Despliega al Líder</em></span></div>
+        </li>
+        <li style="padding: 0.6rem 0.875rem;">
+          <div class="prio-num" style="font-size:14px; min-width:22px;">2</div>
+          <div class="prio-body"><span class="prio-detail">¿Acción de Líder Gratis o sobran recursos? → <em>Usa Acción de Líder</em></span></div>
+        </li>
+        <li style="padding: 0.6rem 0.875rem;">
+          <div class="prio-num" style="font-size:14px; min-width:22px;">3</div>
+          <div class="prio-body"><span class="prio-detail">¿Puede matar unidad sin morir / Romper escudo? → <em>Ataca unidad</em></span></div>
+        </li>
+        <li style="padding: 0.6rem 0.875rem;">
+          <div class="prio-num" style="font-size:14px; min-width:22px;">4</div>
+          <div class="prio-body"><span class="prio-detail">¿Carta Activa es Unidad/Mejora pagable? → <em>Juega Carta</em></span></div>
+        </li>
+        <li style="padding: 0.6rem 0.875rem;">
+          <div class="prio-num" style="font-size:14px; min-width:22px;">5</div>
+          <div class="prio-body"><span class="prio-detail">¿Puede atacar a la Base seguro o Overwhelm? → <em>Ataca Base</em></span></div>
+        </li>
+        <li style="padding: 0.6rem 0.875rem;">
+          <div class="prio-num" style="font-size:14px; min-width:22px;">6</div>
+          <div class="prio-body"><span class="prio-detail">¿Carta Activa es Evento pagable? → <em>Juega Evento</em></span></div>
+        </li>
+        <li style="padding: 0.6rem 0.875rem;">
+          <div class="prio-num" style="font-size:14px; min-width:22px;">7</div>
+          <div class="prio-body"><span class="prio-detail">Ninguna anterior (Trade Agresivo) → <em>Ataca unidad mayor poder</em></span></div>
+        </li>
+        <li style="padding: 0.6rem 0.875rem;">
+          <div class="prio-num" style="font-size:14px; min-width:22px;">8</div>
+          <div class="prio-body"><span class="prio-detail">Sin acciones posibles → <em>Descarta Carta Activa y Pasa / Iniciativa</em></span></div>
+        </li>
+      </ul>
+
+      <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
+        <p style="font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 0.75rem;">// REAGRUPAMIENTO DEL AUTOMA</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+          <div style="background: var(--bg-card); padding: 0.75rem; border: 1px solid var(--border-subtle);">
+            <p style="font-size:12px; margin:0;"><strong style="color:var(--text-primary);">1. Robar</strong><br>+2 cartas a la Pila de Mano (del Mazo Ppal).</p>
+          </div>
+          <div style="background: var(--bg-card); padding: 0.75rem; border: 1px solid var(--border-subtle);">
+            <p style="font-size:12px; margin:0;"><strong style="color:var(--text-primary);">2. Recursar</strong><br>+1 carta del Mazo Ppal a Recursos (Max 10).</p>
+          </div>
+          <div style="background: var(--bg-card); padding: 0.75rem; border: 1px solid var(--border-subtle);">
+            <p style="font-size:12px; margin:0;"><strong style="color:var(--text-primary);">3. Preparar</strong><br>Actualizar CCA a total de recursos.</p>
+          </div>
+          <div style="background: var(--bg-card); padding: 0.75rem; border: 1px solid var(--border-subtle);">
+            <p style="font-size:12px; margin:0;"><strong style="color:var(--text-primary);">Target</strong><br>Ataca el de + Poder / Defiende el de + HP.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-logo">// EL ORÁCULO OSCURO — VERSIÓN DEFINITIVA 2.2</p>
+    <p>Sistema de juego en solitario no oficial para Star Wars™: Unlimited.<br>
+    © & ™ Lucasfilm Ltd. Star Wars: Unlimited es un producto de Fantasy Flight Games.<br>
+    Este documento es una creación de fan sin fines comerciales.</p>
+  </footer>
+
+</div>
+</body>
+</html>
